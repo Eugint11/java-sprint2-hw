@@ -2,15 +2,15 @@ import java.util.List;
 
 public class YearLine {
 
-    private String month;
+    private int month;
     private Integer amount;
     private Boolean is_expense;
 
-    public String getMonth() {
+    public int getMonth() {
         return month;
     }
 
-    public void setMonth(String month) {
+    public void setMonth(int month) {
         this.month = month;
     }
 
@@ -33,7 +33,7 @@ public class YearLine {
     }
 
     YearLine(){
-        month = "01";
+        month = 01;
         amount=0;
         is_expense=true;
     }

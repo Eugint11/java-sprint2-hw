@@ -2,10 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Main {
@@ -17,26 +14,30 @@ public class Main {
 
         while(true){
             printMenu();
-            String scan = scanner.nextLine();
+            String scan = scanner.next();
             switch(scan){
                 case("1"):{
-                    for(String files: findFiles("m.2021")){
-                        System.out.println(files);
+                    System.out.println("Введите год отчетности: ");
+                    int year = scanner.nextInt();
+                    for(String files: findFiles("m."+year)){
+                        //System.out.println(files);
                         List<String> file = readFileContents(files);
                         monthlyReports.add(new MonthlyReport(file));
                     }
                     break;
                 }
                 case("2"):{
-                    for(String files: findFiles("y.2021")){
-                        System.out.println(files);
+                    System.out.println("Введите год отчетности: ");
+                    int year = scanner.nextInt();
+                    for(String files: findFiles("y."+year)){
+                        //System.out.println(files);
                         List<String> file = readFileContents(files);
                         yearlyReports.add(new YearlyReport(file));
                     }
                     break;
                 }
                 case("3"):{
-                    System.out.println("3");
+                    reconciliation(monthlyReports,yearlyReports.get(0));
                     break;
                 }
                 case("4"):{
@@ -54,7 +55,7 @@ public class Main {
                     break;
                 }
                 case("0"):{
-                    System.out.println("0");
+                    System.out.println("До свидания!");
                     return;
                 }
                 default:{
@@ -102,6 +103,66 @@ public class Main {
         } catch (IOException e) {
             System.out.println("Невозможно прочитать файл с отчётом. Возможно файл не находится в нужной директории.");
             return Collections.emptyList();
+        }
+    }
+
+    //Сверить годовой и месячные отчеты
+    static void reconciliation(ArrayList<MonthlyReport> monthlyReports, YearlyReport yearlyReport){
+        HashMap<Integer, Integer> monthlyExpenses = new HashMap<>();
+        HashMap<Integer, Integer> monthlyIncomes = new HashMap<>();
+
+        for(int i=0; i<monthlyReports.size(); i++) {
+            int income = monthlyReports.get(i).getSum(false);
+            int expense = monthlyReports.get(i).getSum(true);
+
+            monthlyIncomes.put((i+1), income);
+            monthlyExpenses.put((i+1), expense);
+        }
+
+        boolean approve=true;
+        for(YearLine yearLine: yearlyReport.getYearReport()){
+
+            if(yearLine.getIs_expense()){
+                int monthlyExpense=0;
+                try{
+                    monthlyExpense = monthlyExpenses.get(yearLine.getMonth());
+                    //System.out.println("monthlyExpense: "+monthlyExpense);
+                }
+                catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+                if(yearLine.getAmount()==monthlyExpense){
+                    //System.out.println(true);
+                    continue;
+                }
+                else{
+                    //System.out.println(yearLine.getMonth());
+                    //System.out.println(false);
+                    approve=false;
+                }
+            }
+            else{
+                int monthlyIncome=0;
+                try{
+                    monthlyIncome = monthlyIncomes.get(yearLine.getMonth());
+                    //System.out.println("monthlyIncome: "+monthlyIncome);
+                }
+                catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+                if(yearLine.getAmount()==monthlyIncome){
+                    //System.out.println(true);
+                    continue;
+                }
+                else{
+                    //System.out.println(yearLine.getMonth());
+                    //System.out.println(false);
+                    approve=false;
+                }
+            }
+        }
+        if(approve){
+            System.out.println("Операция завершена успешно");
         }
     }
 

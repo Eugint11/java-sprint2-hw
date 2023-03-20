@@ -3,7 +3,16 @@ import java.util.HashMap;
 import java.util.List;
 
 public class YearlyReport {
-    ArrayList<YearLine> yearReport;
+    private ArrayList<YearLine> yearReport;
+    public ArrayList<YearLine> getYearReport() {
+        return yearReport;
+    }
+
+    public void setYearReport(ArrayList<YearLine> yearReport) {
+        this.yearReport = yearReport;
+    }
+
+
     YearlyReport(List<String> file){
         yearReport = new ArrayList<>();
         if(!file.isEmpty()){
@@ -14,7 +23,7 @@ public class YearlyReport {
         for(int i=1; i<file.size(); i++){
             String[] lineContents = file.get(i).split(",");
             YearLine line = new YearLine();
-            line.setMonth(lineContents[0]);
+            line.setMonth(Integer.valueOf(lineContents[0]));
             line.setAmount(Integer.valueOf(lineContents[1]));
             line.setIs_expense(Boolean.valueOf(lineContents[2]));
             yearReport.add(line);

@@ -35,4 +35,23 @@ public class MonthlyReport {
             System.out.println(line.getItem_name()+" "+line.getIs_expense()+" "+line.getQuantity()+" "+line.getSum_of_one());
         }
     }
+
+    int getSum(boolean isExpense){
+        int sum=0;
+        if(isExpense){
+            for(MonthLine line: monthReport){
+                if(line.getIs_expense()){
+                    sum+=line.getSum_of_one()*line.getQuantity();
+                }
+            }
+        }
+        else{
+            for(MonthLine line: monthReport){
+                if(!line.getIs_expense()){
+                    sum+=line.getSum_of_one()*line.getQuantity();
+                }
+            }
+        }
+        return sum;
+    }
 }
