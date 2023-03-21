@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -9,48 +11,63 @@ public class Main {
     public static void main(String[] args) {
         // Поехали!
         Scanner scanner = new Scanner(System.in);
-        ArrayList<MonthlyReport> monthlyReports = new ArrayList<>();
-        ArrayList<YearlyReport> yearlyReports = new ArrayList<>();
-
+        HashMap<Integer, ArrayList<MonthlyReport>> monthlyReports = new HashMap<>();
+        HashMap<Integer, YearlyReport> yearlyReports = new HashMap<>();
+        //Год отчетности
+        int year = 2021;
         while(true){
             printMenu();
             String scan = scanner.next();
             switch(scan){
                 case("1"):{
-                    System.out.println("Введите год отчетности: ");
-                    int year = scanner.nextInt();
+                    ArrayList<MonthlyReport> reports = new ArrayList<>();
                     for(String files: findFiles("m."+year)){
-                        //System.out.println(files);
                         List<String> file = readFileContents(files);
-                        monthlyReports.add(new MonthlyReport(file));
+                        reports.add(new MonthlyReport(file));
                     }
+                    monthlyReports.put(year, reports);
                     break;
                 }
                 case("2"):{
-                    System.out.println("Введите год отчетности: ");
-                    int year = scanner.nextInt();
+                    YearlyReport report = null;
                     for(String files: findFiles("y."+year)){
                         //System.out.println(files);
                         List<String> file = readFileContents(files);
-                        yearlyReports.add(new YearlyReport(file));
+                        report = new YearlyReport(file);
                     }
+                    yearlyReports.put(year, report);
                     break;
                 }
                 case("3"):{
-                    reconciliation(monthlyReports,yearlyReports.get(0));
+                    reconciliation(monthlyReports.get(year),yearlyReports.get(year));
                     break;
                 }
                 case("4"):{
-                    for(int i=0; i<monthlyReports.size(); i++) {
-                        System.out.printf("%nMecяц "+(i+1)+":%n");
-                        monthlyReports.get(i).getReport();
+                    int size = 0;
+                    try{
+                        size = monthlyReports.get(year).size();
+                    }
+                    catch (NullPointerException e){
+                        System.out.println("Не найдено ни одного отчета!");
+                        break;
+                    }
+                    for(int i=0; i<size; i++) {
+                        Month month = Month.of((i+1));
+                        Locale loc = Locale.forLanguageTag("ru");
+                        String printMonth = month.getDisplayName(TextStyle.FULL_STANDALONE, loc);
+                        System.out.println(printMonth.substring(0, 1).toUpperCase() + printMonth.substring(1));
+                        monthlyReports.get(year).get(i).getReport();
                     }
                     break;
                 }
                 case("5"):{
                     System.out.printf("%nОтчет за год%n");
-                    for(int i=0; i<yearlyReports.size(); i++) {
-                        yearlyReports.get(i).getReport();
+                    try{
+                        yearlyReports.get(year).getReport();
+                    }
+                    catch (NullPointerException e){
+                        System.out.println("Не найдено ни одного отчета!");
+                        break;
                     }
                     break;
                 }
@@ -93,7 +110,6 @@ public class Main {
         }
         return null;
     }
-
 
     //Прочитать файл
     static List<String> readFileContents(String path) {

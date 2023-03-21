@@ -1,11 +1,10 @@
-
-
 public class MonthLine {
     private String item_name;
     private Boolean is_expense;
     private Integer quantity;
     private Integer sum_of_one;
 
+    //Конструктор
     MonthLine(){
         item_name = null;
         is_expense=true;
@@ -13,13 +12,9 @@ public class MonthLine {
         sum_of_one = 0;
     }
 
-    public String getItem_name() {
-        return item_name;
-    }
+    public String getItem_name() { return item_name; }
 
-    public void setItem_name(String item_name) {
-        this.item_name = item_name;
-    }
+    public void setItem_name(String item_name) { this.item_name = item_name; }
 
     public Boolean getIs_expense() {
         return is_expense;

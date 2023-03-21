@@ -1,14 +1,10 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 
 public class MonthlyReport {
     ArrayList<MonthLine> monthReport;
+
     //Конструктор
     MonthlyReport(List<String> file){
         monthReport = new ArrayList<>();
@@ -29,13 +25,16 @@ public class MonthlyReport {
             monthReport.add(line);
         }
     }
+
     //Вывести отчет за месяц
     void getReport(){
-        for(MonthLine line: monthReport){
-            System.out.println(line.getItem_name()+" "+line.getIs_expense()+" "+line.getQuantity()+" "+line.getSum_of_one());
-        }
+        System.out.print("Самая большая трата: ");
+        getMaxByType(true);
+        System.out.print("Самый прибыльный товар: ");
+        getMaxByType(false);
     }
 
+    //Получить сумму по доходам/расходам
     int getSum(boolean isExpense){
         int sum=0;
         if(isExpense){
@@ -53,5 +52,34 @@ public class MonthlyReport {
             }
         }
         return sum;
+    }
+
+    //Вывести максимальное по расходам/доходам
+    void getMaxByType(boolean isExpense){
+        int maxSum = 0;
+        String maxItem = null;
+        if(isExpense){
+            for(MonthLine line: monthReport){
+                if(line.getIs_expense()){
+                    int sum = line.getSum_of_one()*line.getQuantity();
+                    if(maxSum<sum) {
+                        maxSum = sum;
+                        maxItem = line.getItem_name();
+                    }
+                }
+            }
+        }
+        else{
+            for(MonthLine line: monthReport){
+                if(!line.getIs_expense()){
+                    int sum = line.getSum_of_one()*line.getQuantity();
+                    if(maxSum<sum) {
+                        maxSum = sum;
+                        maxItem = line.getItem_name();
+                    }
+                }
+            }
+        }
+        System.out.println(maxItem+"= "+maxSum);
     }
 }

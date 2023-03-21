@@ -1,5 +1,3 @@
-import java.util.List;
-
 public class YearLine {
 
     private int month;
@@ -14,11 +12,7 @@ public class YearLine {
         this.month = month;
     }
 
-
-
-    public Integer getAmount() {
-        return amount;
-    }
+    public Integer getAmount() { return amount; }
 
     public void setAmount(Integer amount) {
         this.amount = amount;
@@ -32,6 +26,7 @@ public class YearLine {
         this.is_expense = is_expense;
     }
 
+    //Конструктор
     YearLine(){
         month = 01;
         amount=0;
