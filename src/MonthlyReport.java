@@ -28,10 +28,15 @@ public class MonthlyReport {
 
     //Вывести отчет за месяц
     void getReport(){
-        System.out.print("Самая большая трата: ");
-        getMaxByType(true);
-        System.out.print("Самый прибыльный товар: ");
-        getMaxByType(false);
+        if(monthReport.size() == 0){
+            System.out.println("Пустой месячный отчет");
+        }
+        else {
+            System.out.print("Самая большая трата: ");
+            getMaxByType(true);
+            System.out.print("Самый прибыльный товар: ");
+            getMaxByType(false);
+        }
     }
 
     //Получить сумму по доходам/расходам
@@ -80,6 +85,6 @@ public class MonthlyReport {
                 }
             }
         }
-        System.out.println(maxItem+"= "+maxSum);
+        System.out.println(maxItem+" = "+maxSum);
     }
 }

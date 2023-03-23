@@ -41,42 +41,63 @@ public class YearlyReport {
         int income = 0;
         int expense = 0;
         HashSet<Integer> months = new HashSet<>();
-        for(YearLine line: getYearReport()){
-            months.add(line.getMonth());
+        if(getYearReport().size() == 0){
+            System.out.println("Годовой отчет пустой");
+            return;
         }
-
-
-        for(int monthNumber: months){
-            Month month = Month.of(monthNumber);
-            Locale loc = Locale.forLanguageTag("ru");
-            String printMonth = month.getDisplayName(TextStyle.FULL_STANDALONE, loc);
-            System.out.println(printMonth.substring(0, 1).toUpperCase() + printMonth.substring(1));
-
-            for(YearLine line: getYearReport()){
-                if(line.getMonth()==monthNumber && line.getIs_expense()){
-                    expense = line.getAmount();
-                }
-                else if(line.getMonth()==monthNumber){
-                    income = line.getAmount();
-                }
+        else {
+            for (YearLine line : getYearReport()) {
+                months.add(line.getMonth());
             }
-            int ProfitOfMonth = getProfitOfMonth(income, expense);
-            profit.put(monthNumber, ProfitOfMonth);
-            System.out.println("Прибыль = "+ ProfitOfMonth);
-        }
+            for (int monthNumber : months) {
+                Month month = Month.of(monthNumber);
+                Locale loc = Locale.forLanguageTag("ru");
+                String printMonth = month.getDisplayName(TextStyle.FULL_STANDALONE, loc);
+                System.out.println(printMonth.substring(0, 1).toUpperCase() + printMonth.substring(1));
 
-        int sum = 0;
-        for(int profitLine: profit.values()){
-            sum+=profitLine;
-        }
-        double avg = sum/profit.size();
-        System.out.println("Средняя прибыль = "+ avg);
+                for (YearLine line : getYearReport()) {
+                    if (line.getMonth() == monthNumber && line.getIs_expense()) {
+                        expense = line.getAmount();
+                    } else if (line.getMonth() == monthNumber) {
+                        income = line.getAmount();
+                    }
+                }
+                int ProfitOfMonth = getProfitOfMonth(income, expense);
+                profit.put(monthNumber, ProfitOfMonth);
+                System.out.println("Прибыль = " + ProfitOfMonth);
+            }
 
+            int sum = 0;
+            for (int profitLine : profit.values()) {
+                sum += profitLine;
+            }
+            double avg = sum / profit.size();
+            System.out.println("Средняя прибыль = " + String.format("%.2f", avg));
+            System.out.println("Средний доход = " + String.format("%.2f",getAvByType(false)));
+            System.out.println("Средний расход = " + String.format("%.2f",getAvByType(true)));
+        }
     }
 
     //Вычислить прибыль за месяц
     int getProfitOfMonth(int income, int expense){
         int profit = income - expense;
         return profit;
+    }
+
+    double getAvByType(boolean isExpensive){
+        double sum=0.0;
+        int count=0;
+        for(YearLine line: getYearReport()){
+            if(line.getIs_expense() == isExpensive){
+                sum+=line.getAmount();
+                count++;
+            }
+        }
+        if(count==0){
+            return 0;
+        }
+        else{
+            return sum/count;
+        }
     }
 }
