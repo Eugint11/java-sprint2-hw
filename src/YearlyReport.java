@@ -100,4 +100,27 @@ public class YearlyReport {
             return sum/count;
         }
     }
+
+    public boolean searchMonth(HashMap<Integer, Integer> monthlyProfit, boolean isExpensive){
+        Converter converter = new Converter();
+        HashSet<Integer> yearlyLines = new HashSet<>();
+        for(YearLine yearLine: getYearReport()){
+            if(yearLine.getIs_expense()){
+                yearlyLines.add(yearLine.getMonth());
+            }
+        }
+        for(int month: monthlyProfit.keySet()){
+            if(yearlyLines.contains(month)) {
+                System.out.println("Отсутствует запись о "
+                        + converter.getExpensiveOrIncome(isExpensive).toLowerCase()+ "е"
+                        + " за "
+                        + converter.getNameMonth(month)
+                        +" в годовом отчете");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }

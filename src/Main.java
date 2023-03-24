@@ -2,17 +2,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Month;
-import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Stream;
 
 public class Main {
+    private static Converter converter;
     public static void main(String[] args) {
         // Поехали!
         Scanner scanner = new Scanner(System.in);
         HashMap<Integer, ArrayList<MonthlyReport>> monthlyReports = new HashMap<>();
         HashMap<Integer, YearlyReport> yearlyReports = new HashMap<>();
+        converter = new Converter();
         //Год отчетности
         int year = 2021;
         while(true){
@@ -31,7 +31,6 @@ public class Main {
                 case("2"):{
                     YearlyReport report = null;
                     for(String files: findFiles("y."+year)){
-                        //System.out.println(files);
                         List<String> file = readFileContents(files);
                         report = new YearlyReport(file);
                     }
@@ -56,7 +55,7 @@ public class Main {
                     }
                     else {
                         for (int i = 0; i < monthlyReports.get(year).size(); i++) {
-                            String printMonth = getNameMonth(i + 1);
+                            String printMonth = converter.getNameMonth(i + 1);
                             System.out.println(printMonth.substring(0, 1).toUpperCase() + printMonth.substring(1));
                             monthlyReports.get(year).get(i).getReport();
                         }
@@ -68,7 +67,7 @@ public class Main {
                         System.out.println("Отсутствует годовой отчет!");
                     }
                     else{
-                        System.out.printf("Отчет за год%n");
+                        System.out.printf("Отчет за год:%n");
                         yearlyReports.get(year).getReport();
                     }
                     break;
@@ -78,7 +77,7 @@ public class Main {
                     return;
                 }
                 default:{
-                    System.out.println("Такой команды не существует");
+                    System.out.println("Такой команды не существует!");
                     break;
                 }
             }
@@ -126,7 +125,9 @@ public class Main {
 
     //Сверить годовой и месячные отчеты
     static void reconciliation(ArrayList<MonthlyReport> monthlyReports, YearlyReport yearlyReport){
-        //Мапы для прибылей и трат <Месяц, сумма>
+        //Флаг успешности сверки
+        boolean approve=true;
+        //Мапы для дохода и расхода <Месяц, сумма>
         HashMap<Integer, Integer> monthlyExpenses = new HashMap<>();
         HashMap<Integer, Integer> monthlyIncomes = new HashMap<>();
         //Заполнение мап
@@ -136,62 +137,59 @@ public class Main {
             monthlyIncomes.put((i+1), income);
             monthlyExpenses.put((i+1), expense);
         }
-        //Флаг успешности сверки
-        boolean approve=true;
-        //Цикл сверки
-        for(YearLine yearLine: yearlyReport.getYearReport()){
-            //Проверка типа записи прибыль/трата в годовом отчете
-            if(yearLine.getIs_expense()){
-                int monthlyExpense=0;
-                //Поиск траты в месячном отчете по номеру месяца в годовом отчете
-                //Если не находит, то NULL
-                try{
-                    monthlyExpense = monthlyExpenses.get(yearLine.getMonth());
-                }
-                catch (NullPointerException e) {
-                    System.out.println("Отсутствует месячный отчет за "
-                            + getNameMonth(yearLine.getMonth())
-                            + " месяц");
-                }
-                if(yearLine.getAmount()==monthlyExpense){
+        if(yearlyReport.searchMonth(monthlyExpenses, true)){
+            approve=false;
+        }
+        else if(yearlyReport.searchMonth(monthlyExpenses, true)){
+            approve=false;
+        }
+        else {
+            //Цикл сверки
+            for (YearLine yearLine : yearlyReport.getYearReport()) {
+                //Проверка типа записи Доход/Расход в годовом отчете
+                HashSet<Integer> monthlyNumbers = new HashSet<>();
+                monthlyNumbers.addAll(monthlyExpenses.keySet());
+                if (!monthlyNumbers.contains(yearLine.getMonth())) {
+                    System.out.println("Отсутствует запись о "
+                            + converter.getExpensiveOrIncome(yearLine.getIs_expense()).toLowerCase() + "е"
+                            + " за "
+                            + converter.getNameMonth(yearLine.getMonth())
+                            + " в месячном отчете или отсутствует отчет");
+                    approve = false;
                     continue;
                 }
-                else{
-                    System.out.println("В месяце: "
-                            + getNameMonth(yearLine.getMonth())
-                            + "\nВ годовом отчете: "
-                            + yearLine.getAmount()
-                            + ", а в месячном отчете: "
-                            + monthlyExpense
-                            );
-                    approve=false;
-                }
-            }
-            else{
-                int monthlyIncome=0;
-                //Поиск траты в месячном отчете по номеру месяца в годовом отчете
-                //Если не находит, то NULL
-                try{
-                    monthlyIncome = monthlyIncomes.get(yearLine.getMonth());
-                }
-                catch (NullPointerException e) {
-                    Month month = Month.of((yearLine.getMonth()));
-                    Locale loc = Locale.forLanguageTag("ru");
-                    String printMonth = month.getDisplayName(TextStyle.FULL_STANDALONE, loc);
-                    System.out.println("Отсутствует месячный отчет за " + printMonth + " месяц");
-                }
-                if(yearLine.getAmount()==monthlyIncome){
-                    continue;
-                }
-                else{
-                    System.out.println("В месяце: "
-                            + getNameMonth(yearLine.getMonth())
-                            + "\nВ годовом отчете: "
-                            + yearLine.getAmount()
-                            + ", а в месячном отчете: "
-                            + monthlyIncome
-                    );
-                    approve=false;
+                if (yearLine.getIs_expense()) {
+                    int monthlyExpense = monthlyExpenses.get(yearLine.getMonth());
+                    if (yearLine.getAmount() == monthlyExpense) {
+                        continue;
+                    } else {
+                        System.out.println("В месяце: "
+                                + converter.getNameMonth(yearLine.getMonth())
+                                + "\nВ годовом отчете "
+                                + converter.getExpensiveOrIncome(yearLine.getIs_expense()).toLowerCase()
+                                + " составил: "
+                                + yearLine.getAmount()
+                                + ", а в месячном отчете: "
+                                + monthlyExpense
+                        );
+                        approve = false;
+                    }
+                } else {
+                    int monthlyIncome = monthlyIncomes.get(yearLine.getMonth());
+                    if (yearLine.getAmount() == monthlyIncome) {
+                        continue;
+                    } else {
+                        System.out.println("В месяце: "
+                                + converter.getNameMonth(yearLine.getMonth())
+                                + "\nВ годовом отчете "
+                                + converter.getExpensiveOrIncome(yearLine.getIs_expense()).toLowerCase()
+                                + " составил: "
+                                + yearLine.getAmount()
+                                + ", а в месячном отчете: "
+                                + monthlyIncome
+                        );
+                        approve = false;
+                    }
                 }
             }
         }
@@ -204,11 +202,5 @@ public class Main {
         }
     }
 
-    //Конвертер номера месяца в имя
-    public static String getNameMonth(int month){
-        Month printerMonth = Month.of((month));
-        Locale loc = Locale.forLanguageTag("ru");
-        return printerMonth.getDisplayName(TextStyle.FULL_STANDALONE, loc);
-    }
 }
 
