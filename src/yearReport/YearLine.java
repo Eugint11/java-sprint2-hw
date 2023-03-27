@@ -1,3 +1,5 @@
+package yearReport;
+
 public class YearLine {
 
     private int month;

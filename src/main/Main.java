@@ -1,3 +1,5 @@
+package main;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -5,7 +7,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Main {
+import monthReport.*;
+import yearReport.*;
+
+public class Main  {
     private static Converter converter;
     public static void main(String[] args) {
         // Поехали!

@@ -1,3 +1,5 @@
+package monthReport;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -7,7 +9,7 @@ public class MonthlyReport {
     ArrayList<MonthLine> monthReport;
 
     //Конструктор
-    MonthlyReport(List<String> file){
+    public MonthlyReport(List<String> file){
         monthReport = new ArrayList<>();
         if(!file.isEmpty()){
             setItems(file);
@@ -15,7 +17,7 @@ public class MonthlyReport {
     }
 
     //Записать данные из файла
-    void setItems(List<String> file){
+    public void setItems(List<String> file){
         for(int i=1; i<file.size(); i++){
             String[] lineContents = file.get(i).split(",");
             MonthLine line = new MonthLine();
@@ -28,7 +30,7 @@ public class MonthlyReport {
     }
 
     //Вывести отчет за месяц
-    void getReport(){
+    public void getReport(){
         if(monthReport.size() == 0){
             System.out.println("Пустой месячный отчет");
         }
@@ -41,7 +43,7 @@ public class MonthlyReport {
     }
 
     //Получить сумму по доходам/расходам
-    int getSum(boolean isExpense){
+    public int getSum(boolean isExpense){
         int sum=0;
         if(isExpense){
             for(MonthLine line: monthReport){
@@ -61,7 +63,7 @@ public class MonthlyReport {
     }
 
     //Вывести максимальное по расходам/доходам
-    void getMaxByType(boolean isExpense){
+    public void getMaxByType(boolean isExpense){
         int maxSum = 0;
         String maxItem = null;
         if(isExpense){

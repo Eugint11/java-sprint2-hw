@@ -1,6 +1,9 @@
+package yearReport;
+
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.*;
+import main.*;
 
 public class YearlyReport {
     private ArrayList<YearLine> yearReport;
@@ -16,7 +19,7 @@ public class YearlyReport {
     }
 
     //Конструктор годового отчета
-    YearlyReport(List<String> file){
+    public YearlyReport(List<String> file){
         yearReport = new ArrayList<>();
         if(!file.isEmpty()){
             setItems(file);
@@ -24,7 +27,7 @@ public class YearlyReport {
     }
 
     //Записать данные из файла
-    void setItems(List<String> file){
+    public void setItems(List<String> file){
         for(int i=1; i<file.size(); i++){
             String[] lineContents = file.get(i).split(",");
             YearLine line = new YearLine();
@@ -36,7 +39,7 @@ public class YearlyReport {
     }
 
     //Вычислить и вывести годовой отчет
-    void getReport(){
+    public void getReport(){
         HashMap<Integer, Integer> profit = new HashMap<>();
         int income = 0;
         int expense = 0;
